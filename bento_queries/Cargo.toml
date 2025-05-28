@@ -1,0 +1,17 @@
+[package]
+name = "bento_queries"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4.41"
+databento = "0.25.0"
+fnv = "1.0.7"
+nalgebra = "0.33.1"
+serde = { version = "1.0.210", features = ["derive"] }
+surrealdb = "2.3.3"
+time = "0.3.36"
+tokio = { version = "1.45.0", features = ["macros", "rt-multi-thread"] }
+
+[lib]
+path = "lib.rs"

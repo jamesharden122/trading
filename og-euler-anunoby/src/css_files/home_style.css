@@ -1,0 +1,136 @@
+/* Table Styling */
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: Arial, sans-serif;
+    background-color: rgb(230, 230, 250);
+    line-height: 1.6;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+.grid-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 1%;
+    width: 100%;
+}
+
+.grid-section {
+    display: grid;
+    width: 50%;
+    gap: 1%;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    grid-template-rows: auto; /* Automatically adjusts row height */
+}
+
+/* Individual grid item */
+.grid-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    
+}
+
+
+.table_cls {
+    width: 95%;
+    height:95%;
+    border-collapse: collapse;
+    background-color: rgb(255, 250, 250);
+    font-size: 1.1em;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styling */
+.text-left-header, .text-right-header {
+    padding: 10px 15px;
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    text-align: left;
+    font-size:1.2em;
+}
+
+.text-right-header {
+    text-align: right;
+    font-size: 1.1em;
+}
+
+/* Table Body Styling */
+.table-hover tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.text-left, .text-right {
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Overall Table Style */
+.trade-table {
+    width: 95%;
+    height:95%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 1.1em;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    margin: 20px 0 0 2%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Header */
+.trade-table thead th {
+    padding: 12px 15px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 2px solid #dddddd;
+}
+
+/* Table Body */
+.trade-table tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #dddddd;
+    text-align: left;
+    color: #333333;
+}
+
+/* Row Hover */
+.trade-table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* Individual Trade Row */
+.ind-trade {
+    background-color: #fafafa;
+    transition: background-color 0.3s ease;
+}
+
+/* Alternate Row Coloring */
+.trade-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.main_chart {
+    width: 100%;
+    margin: 2%;
+}

@@ -21,22 +21,26 @@ mod tests {
 
     #[tokio::test]
     async fn upload_bento() {
-        let client: Client = authent_bento(String::from("db-DvDSjrPnCcQhKCuEyuQaj3e4MhNhk"))
+        let client: Client = authent_bento(String::from("db-QWwdduSPaGnRREGu9iMdngwg8mUU9"))
             .await
             .unwrap();
         let data_set: String = String::from("XNAS.ITCH");
-        let symbol: String = String::from("SPY");
-        let d1: OffsetDateTime = datetime!(2025-05-10 00:00 UTC);
-        let d2: OffsetDateTime = datetime!(2025-05-22 00:00 UTC);
+        let tickers = vec![
+           String::from("ARLP"),
+           String::from("HPk"),
+           String::from("NVDA"),
+           String::from("GOOG"),
+           String::from("CDE"),
+           String::from("FCX"),
+        ];
+        let d1: OffsetDateTime = datetime!(2025-05-07 00:00 UTC);
+        let d2: OffsetDateTime = datetime!(2025-06-06 00:00 UTC);
         let data_schema: Schema = Schema::Trades;
         let limit_int = NonZeroU64::new(1000).unwrap();
-        let trade_vec = hist_req_helper(data_set, symbol, d1, d2, data_schema, limit_int, client)
-            .await
-            .unwrap();
-        println!("{:?}", trade_vec.len());
-        upload_to_surreal_db(trade_vec, "root", "root", "equities", "historical", "trade")
-            .await
-            .unwrap();
+        let trade_data = panel_data_request(data_set,tickers,d1,d2,data_schema,limit_int,client).await.unwrap();
+        for (_,trade_vec) in trade_data {
+            upload_to_surreal_db(trade_vec, "root", "root", "equities", "historical", "trade").await.unwrap();
+        }
     }
 
     #[tokio::test]

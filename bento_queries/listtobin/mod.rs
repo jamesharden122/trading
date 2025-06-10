@@ -29,7 +29,7 @@ fn write_columnar_data_to_file(
 // Assuming your existing write_columnar_data_to_file function
 pub async fn iterate_and_match(map: FnvHashMap<String, VecType>) {
     let mut bytes_map: FnvHashMap<String, Vec<u8>> = FnvHashMap::default();
-    let begin_path = "/home/yakaman/Dropbox/Desktop/trading/bento_queries/";
+    let begin_path = "/home/yakaman/trading/bento_queries/";
 
     // Iterate over the FnvHashMap
     println!("{:?}", map.keys());

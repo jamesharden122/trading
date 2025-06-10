@@ -7,14 +7,15 @@ struct IEEE754Processor:
         self.simd_dec_list = simd_dec_list
         
 
-    fn float_64_conversion(self) -> Tensor[DType.float64]:
+    # Updated method that returns a single SIMD vector instead of a Tensor or list
+    fn float_64_conversion(self) -> SIMD[DType.float64, 64]:
         var simd_processed_bits = self.process_simd_list(self.simd_dec_list)
-        var spec = TensorSpec(DType.float64,len(simd_processed_bits),1)
-        var tensor_col = Tensor[DType.float64](spec)
+        var merged_simd = SIMD[DType.float64, 64]()
         for i in range(len(self.simd_dec_list)):
             var temp_float = self.ieee_754_double_prec(simd_processed_bits[i])
-            tensor_col[Index(i)] = temp_float
-        return tensor_col 
+            merged_simd[i] = temp_float[0]  # Assuming ieee_754_double_prec returns SIMD[float64, 1]
+        return merged_simd
+
     # Method to convert the binary exponent to decimal
     fn binary_to_decimal(self, exponent_simd: SIMD[DType.bool, 16]) -> SIMD[DType.float64, 1]:
         var powers_of_2 = SIMD[DType.int64, 16](1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0, 0, 0, 0, 0)

@@ -1,0 +1,27 @@
+# Rust build artifacts
+**/target/
+
+# Binary data files
+**/*.bin
+
+# Mojo build/output artifacts
+**/*.lock
+**/.csm_setup_*
+**/.magic/
+**/=24.5.0,
+
+# Node/JS (if relevant)
+node_modules/
+
+# Python caches (if relevant)
+**/__pycache__/
+**/*.pyc
+
+# IDEs and editor configurations
+.idea/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+

@@ -3,7 +3,8 @@ use crate::TradeMsg;
 use fnv::FnvHashMap;
 use serde::Deserialize;
 use serde::Serialize;
-use surrealdb::engine::remote::ws::Ws;
+use surrealdb::engine::remote::{http::Http,ws::Ws};
+use surrealdb::engine::remote::ws::Client;
 use surrealdb::opt::auth::Root;
 use surrealdb::{Response, Surreal};
 use time::Instant;
@@ -34,7 +35,7 @@ pub async fn upload_to_surreal_db<'a>(
     // Signin as a namespace, database, or root user
     // Start the timer
     let start = Instant::now();
-    let db = Surreal::new::<Ws>("localhost:8000").await?;
+    let db =Surreal::new::<Http>("34.130.9.209:8000").await?;
     db.signin(Root {
         username: usern,
         password: passw,
@@ -72,7 +73,7 @@ pub async fn query_surr_flex_hashmap(
     table: String,
     variables: Vec<String>,
 ) -> surrealdb::Result<FnvHashMap<String, VecType>> {
-    let db = Surreal::new::<Ws>("localhost:8000").await?;
+   let db = Surreal::new::<Http>("34.130.9.209:8000").await?;
 
     db.signin(Root {
         username: "root",

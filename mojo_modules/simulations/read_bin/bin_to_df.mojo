@@ -1,6 +1,6 @@
-from structs.floatdecoder import float64_column
-from structs.intdecoder import Int64_column, Int32_column
-from structs.uintdecoder import Uint64_column, Uint32_column, Uint8_column
+from .structs.floatdecoder import float64_column
+from .structs.intdecoder import Int64_column, Int32_column
+from .structs.uintdecoder import Uint64_column, Uint32_column, Uint8_column
 from max.tensor import Tensor, TensorSpec, TensorShape
 from max.graph.checkpoint import load, save, TensorDict
 from utils.index import Index

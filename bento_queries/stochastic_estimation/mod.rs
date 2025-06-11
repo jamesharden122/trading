@@ -3,6 +3,9 @@ use chrono::{DateTime, Utc};
 use fnv::FnvHashMap;
 use nalgebra::base::VecStorage;
 use nalgebra::DMatrix;
+use std::collections::BTreeMap;
+use ndarray::Array1;
+
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct MyMatrix {
@@ -49,8 +52,8 @@ impl MyMatrix {
         }
 
         // Calculate dimensions
-        let rows = map.keys().len();
-        let cols = if let Some(first_key) = map.keys().next() {
+        let cols = map.keys().len();
+        let rows = if let Some(first_key) = map.keys().next() {
             map.get(first_key).unwrap().clone().into_vec_f64().len()
         } else {
             0
@@ -69,13 +72,30 @@ impl MyMatrix {
             descrips: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
         }
     }
+    pub fn to_fnv_hashmap(&self) -> Option<FnvHashMap<String, VecType>> {
+        let mut map = FnvHashMap::default();
+
+        // Ensure colnames and columns match
+        assert_eq!(
+            self.colnames.len(),
+            self.data.ncols(),
+            "colnames length does not match matrix column count"
+        );
+
+        // Insert each column under its name
+        for (i, colname) in self.colnames.iter().enumerate() {
+            let column_vec: Vec<f64> = self.data.column(i).iter().copied().collect();
+            map.insert(colname.clone(), VecType::F64Vec(column_vec));
+        }
+        Some(map)
+    }
 
     pub fn add_scalar(&mut self, value: f64) {
         self.data.iter_mut().for_each(|x| *x += value);
     }
 
     // Method to print the dimensions of the matrix
-    pub fn dimmensions(&self) {
+    pub fn dimensions(&self) {
         println!(
             "Matrix has {} rows and {} columns",
             self.data.nrows(),
@@ -194,5 +214,78 @@ impl MyMatrix {
         }
 
         Some(mom_mat)
+    }
+
+    pub fn calculate_bin_data_with_vwap_and_returns(&self, size_ind: usize, time_ind: usize, trade_value_ind: usize, bin_width_ns: u64) -> Option<Self> {
+        let size_col = self.data.column(size_ind);
+        let time_col = self.data.column(time_ind);
+        let price_col = self.data.column(trade_value_ind);
+        println!("completed the column creation");
+        // Map bin_id to (total trade_value, total size, sum of price*size for VWAP)
+        let mut bin_data: BTreeMap<u64, (f64, f64, f64)> = BTreeMap::new();
+        for (&time_ns, (&price, &size)) in time_col.iter().zip(price_col.iter().zip(size_col.iter())) {
+            let bin_id = (time_ns as u64) / bin_width_ns;
+            let entry = bin_data.entry(bin_id).or_insert((0.0, 0.0, 0.0));
+            entry.0 += price;       // total trade_value
+            entry.1 += size;              // total size
+            entry.2 += price * size;      // sum of price*size for VWAP
+        }
+
+        // Sort bins to ensure ordered output
+        let mut bin_ids: Vec<u64> = bin_data.keys().cloned().collect();
+        bin_ids.sort();
+
+        // Compute VWAPs
+        let mut vwaps: Vec<f64> = Vec::new();
+        for &bin_id in &bin_ids {
+            let (total_value, total_size, weighted_sum) = bin_data[&bin_id];
+            let vwap = if total_size > 0.0 { weighted_sum / total_size } else { 0.0 };
+            vwaps.push(vwap);
+        }
+
+        // Compute log returns using VWAPs
+        let mut log_returns: Vec<f64> = vec![0.0]; // First row has no previous VWAP, set to 0
+        for w in vwaps.windows(2) {
+            let lr = (w[1] / w[0]).ln();
+            log_returns.push(lr);
+        }
+    println!("computed returns");
+    // Build the final matrix data
+        let mut final_data: Vec<f64> = Vec::new();
+        for (i, &bin_id) in bin_ids.iter().enumerate() {
+            let (total_value, total_size, weighted_sum) = bin_data[&bin_id];
+            let time_ns_floor = bin_id * bin_width_ns;
+            let vwap = if total_size > 0.0 { weighted_sum / total_size } else { 0.0 };
+            let log_return = log_returns[i];
+
+            final_data.push(total_size);
+            final_data.push(total_value);
+            final_data.push(bin_id as f64);
+            final_data.push(time_ns_floor as f64);
+            final_data.push(vwap);
+            final_data.push(log_return);
+        }
+
+        // Reshape into a matrix: rows = number of bins, 6 columns
+        let col_names: Vec<String> = vec![
+            String::from("total size"),
+            String::from("total value"),
+            String::from("bin id"),
+            String::from("time ns"),
+            String::from("value weighted average price"),
+            String::from("Log Returns"),
+        ];
+        let num_bins = bin_ids.len();
+        let data = DMatrix::from_row_slice(num_bins,6,&final_data);
+        let arr: Array1<f64> = Array1::from_iter(data.column(5).iter().cloned());
+        // Now you can use ndarray functions
+        let mean = arr.mean().unwrap();
+        let var = arr.var(0.0);
+        
+       Some( Self {
+            colnames: col_names,
+            data: data,
+            descrips: (mean,var,0.0,0.0,0.0,0.0)
+        })
     }
 }

@@ -72,6 +72,7 @@ pub async fn query_surr_flex_hashmap(
     dat_base: String,
     table: String,
     variables: Vec<String>,
+    instrument_id_filter: u32,
 ) -> surrealdb::Result<FnvHashMap<String, VecType>> {
    let db = Surreal::new::<Http>("34.130.9.209:8000").await?;
 
@@ -85,9 +86,12 @@ pub async fn query_surr_flex_hashmap(
 
     // Format the variables to create the SELECT part of the query
     let select_vars = variables.join(", ");
-    let query = format!("SELECT {} FROM type::table($table)", select_vars);
+    let query = format!("SELECT {} FROM type::table($table) WHERE hd.instrument_id = $iid", select_vars);
 
-    let mut response: Response = db.query(&query).bind(("table", table)).await?;
+    let mut response: Response = db.query(&query)
+        .bind(("table", table))
+        .bind(("iid", instrument_id_filter))
+        .await?;
 
     // Create a new HashMap with String as the key and VecType as the value
     let mut map: FnvHashMap<String, VecType> = FnvHashMap::default();

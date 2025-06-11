@@ -5,6 +5,7 @@ pub enum VecType {
     I32Vec(Vec<i32>),
     U32Vec(Vec<u32>),
     I64Vec(Vec<i64>),
+    F64Vec(Vec<f64>),
     U64Vec(Vec<u64>),
     StringVec(Vec<String>),
 }
@@ -18,6 +19,7 @@ impl VecType {
             VecType::U32Vec(v) => VecTypeIter::U32Iter(v.iter()),
             VecType::I64Vec(v) => VecTypeIter::I64Iter(v.iter()),
             VecType::U64Vec(v) => VecTypeIter::U64Iter(v.iter()),
+            VecType::F64Vec(v) => VecTypeIter::F64Iter(v.iter()),
             VecType::StringVec(v) => VecTypeIter::StringIter(v.iter()),
         }
     }
@@ -30,6 +32,7 @@ impl VecType {
             VecType::U32Vec(v) => v.into_iter().map(|x| x as f64).collect(),
             VecType::I64Vec(v) => v.into_iter().map(|x| x as f64).collect(),
             VecType::U64Vec(v) => v.into_iter().map(|x| x as f64).collect(),
+            VecType::F64Vec(v) => v,
             VecType::StringVec(v) => v
                 .into_iter()
                 .map(|s| s.parse::<f64>().unwrap_or(0.0))
@@ -46,6 +49,7 @@ pub enum VecTypeIter<'a> {
     U32Iter(std::slice::Iter<'a, u32>),
     I64Iter(std::slice::Iter<'a, i64>),
     U64Iter(std::slice::Iter<'a, u64>),
+    F64Iter(std::slice::Iter<'a, f64>),
     StringIter(std::slice::Iter<'a, String>),
 }
 
@@ -61,6 +65,7 @@ impl<'a> Iterator for VecTypeIter<'a> {
             VecTypeIter::U32Iter(iter) => iter.next().map(VecTypeItem::U32Item),
             VecTypeIter::I64Iter(iter) => iter.next().map(VecTypeItem::I64Item),
             VecTypeIter::U64Iter(iter) => iter.next().map(VecTypeItem::U64Item),
+            VecTypeIter::F64Iter(iter) => iter.next().map(VecTypeItem::F64Item),
             VecTypeIter::StringIter(iter) => iter.next().map(VecTypeItem::StringItem),
         }
     }
@@ -75,6 +80,7 @@ pub enum VecTypeItem<'a> {
     U32Item(&'a u32),
     I64Item(&'a i64),
     U64Item(&'a u64),
+    F64Item(&'a f64),
     StringItem(&'a String),
 }
 
@@ -127,3 +133,11 @@ pub fn extract_string_from_vec_type_item(item: VecTypeItem) -> Option<String> {
         _ => None,
     }
 }
+pub fn extract_f64_from_vec_type_item(item: VecTypeItem) -> Option<f64> {
+    match item {
+        VecTypeItem::F64Item(value) => Some(*value),
+        _ => None,
+    }
+}
+
+

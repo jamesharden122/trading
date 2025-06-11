@@ -56,9 +56,16 @@ mod tests {
         let ns = String::from("equities");
         let db = String::from("historical");
         let map: FnvHashMap<String, VecType> =
-            query_surr_flex_hashmap(ns, db, table, vars).await.unwrap();
+            query_surr_flex_hashmap(ns, db, table, vars,1111).await.unwrap();
         println!("{:?}", &map);
-        let _matrix = MyMatrix::from_hashmap(map.clone());
-        iterate_and_match(map).await;
+        let matrix = MyMatrix::from_hashmap(map.clone());
+        //terate_and_match(map).await;
+        println!("{:?}",matrix.colnames);
+        matrix.head((30,5));
+        let filtered_mat = matrix.calculate_bin_data_with_vwap_and_returns(0,3,4, 600_000_000_000).unwrap();
+        filtered_mat.dimensions();
+        filtered_mat.head((30,6));
+        let filtered_hmap = filtered_mat.to_fnv_hashmap().unwrap();
+        iterate_and_match(filtered_hmap).await;
     }
 }

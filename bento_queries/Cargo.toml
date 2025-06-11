@@ -8,6 +8,7 @@ chrono = "0.4.41"
 databento = "0.25.0"
 fnv = "1.0.7"
 nalgebra = "0.33.1"
+ndarray = "0.16.1"
 serde = { version = "1.0.210", features = ["derive"] }
 surrealdb = { version = "2.3.3", features = ["protocol-http"] }
 time = "0.3.36"

@@ -58,6 +58,16 @@ pub async fn iterate_and_match(map: FnvHashMap<String, VecType>) {
                     println!("U8Vec: {:?}", temp);
                 }
             }
+            VecType::F64Vec(_) => {
+                for val in value.iter() {
+                    let temp = extract_f64_from_vec_type_item(val).unwrap().to_be_bytes();
+                    bytes_map
+                        .entry(key.to_string())
+                        .and_modify(|v| v.extend_from_slice(&temp));
+                    print!("{:?} ", val);
+                    println!("F64Vec: {:?}", temp);
+        }
+    }
             VecType::I32Vec(vec) => {
                 for val in value.iter() {
                     let temp = extract_i32_from_vec_type_item(val).unwrap().to_be_bytes();
